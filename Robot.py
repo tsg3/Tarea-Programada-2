@@ -4,6 +4,7 @@ import os
 import time
 from threading import Thread
 import threading
+import winsound
 
 class Robot:
     def __init__ (self, nom, img, xpos, ypos):
@@ -28,18 +29,21 @@ class Robot:
 
     def izq(self):
         try:
-            robot.set_img("left")
+            robot.set_img("22")
             img=cargarImagen(robot.get_img())
             lbl.configure(image=img)
             lbl.image=img
             time.sleep(0.01)
-            self.xpos=self.get_xpos()-10
+            self.xpos=self.get_xpos()-5
             lbl.place(x=self.get_xpos(),y=self.get_ypos())
             time.sleep(0.01)
-            robot.set_img("robot")
+            robot.set_img("21")
             img=cargarImagen(robot.get_img())
             lbl.configure(image=img)
             lbl.image=img
+            time.sleep(0.01)
+            self.xpos=self.get_xpos()-5
+            lbl.place(x=self.get_xpos(),y=self.get_ypos())
             time.sleep(0.01)
         except Exception as errtxt:
             print ("Error en hilo")
@@ -49,26 +53,63 @@ class Robot:
 
     def der(self):
         try:
-            robot.set_img("right")
+            robot.set_img("1")
             img=cargarImagen(robot.get_img())
             lbl.configure(image=img)
             lbl.image=img
             time.sleep(0.01)
-            self.xpos=self.get_xpos()+10
+            self.xpos=self.get_xpos()+5
             lbl.place(x=self.get_xpos(),y=self.get_ypos())
             time.sleep(0.01)
-            robot.set_img("robot")
+            robot.set_img("0")
             img=cargarImagen(robot.get_img())
             lbl.configure(image=img)
             lbl.image=img
+            time.sleep(0.01)
+            self.xpos=self.get_xpos()+5
+            lbl.place(x=self.get_xpos(),y=self.get_ypos())
             time.sleep(0.01)
         except Exception as errtxt:
             print ("Error en hilo")
     def ver_der(self):
         b = Thread(target=self.der, args=())   
-        b.start() 
+        b.start()
+
+    def dance(self):
+        imgnum = 7
+        ciclo = 0
+        try:
+            while ciclo < 3:
+                if imgnum == 17:
+                    ciclo += 1
+                    imgnum = 9
+                robot.set_img(str(imgnum))
+                img=cargarImagen(robot.get_img())
+                lbl.configure(image=img)
+                lbl.image=img
+                time.sleep(0.1)
+                imgnum += 1
+            robot.set_img("7")
+            img=cargarImagen(robot.get_img())
+            lbl.configure(image=img)
+            lbl.image=img
+            time.sleep(0.1)
+        except Exception as errtxt:
+            print ("Error en hilo")
+    def ver_dance(self):
+        c = Thread(target=self.dance, args=())   
+        c.start()
+
+    def music (self):
+        global musica
+        musica += 1
+        if musica % 2 == 1:
+            winsound.PlaySound('C:\\Users\\este0\\Desktop\\Tarea-Programada-2\\Material\\SuperMoon.wav', winsound.SND_ASYNC|winsound.SND_LOOP)
+        else:
+            winsound.PlaySound(None, winsound.SND_PURGE)  
     
-robot=Robot("Carmen","Robot",400,0)
+robot=Robot("Carmen","0",300,0)
+musica = 0 
 
 def cargarImagen(nombre):
     ruta = os.path.join('Material',nombre)
@@ -79,29 +120,28 @@ root=Tk()
 root.minsize(1000,500)
 root.resizable(NO,NO)
 
-cont=Canvas(root,width=1000,height=500,bg="#016101")
+cont=Canvas(root,width=1000,height=500,bg="#000000")
 cont.place(x=0,y=0)
 
 img=cargarImagen(robot.get_img())
-lbl=Label(root,bg="#016101",image=img)
+lbl=Label(root,bg="#000000",image=img,width=400,height=500)
 lbl.place(x=robot.get_xpos(),y=robot.get_ypos())
 lbl.image=img
-
-entrada=Entry(root,width=30)
-entrada.place(x=30,y=0)
-
-#boton=Button(root,command=robot.ver_izq,text="izquierda")
-#boton.place(x=100,y=425)
 
 def Left (event):
     robot.ver_izq() 
 root.bind('<Left>', Left)
 
-#boton=Button(root,command=robot.ver_der,text="derecha")
-#boton.place(x=100,y=450)
-
 def Right (event):
     robot.ver_der() 
-root.bind('<Right>', Right)
+root.bind('<Right>', Right)   
+
+def Up (event):
+    robot.ver_dance() 
+root.bind('<Up>', Up)
+
+def Down (event):
+    robot.music() 
+root.bind('<Down>', Down)
 
 root.mainloop()
